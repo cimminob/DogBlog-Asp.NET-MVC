@@ -20,9 +20,17 @@ namespace DogBlogMvc.Controllers
         }
 
         // GET: Dogs
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.Dogs.ToListAsync());
+            ViewData["CurrentFilter"] = searchString;
+
+            var dogs = from d in _context.Dogs select d;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                dogs = dogs.Where(d => d.Name.Contains(searchString));
+            }
+            return View(await dogs.AsNoTracking().ToListAsync());
         }
 
         // GET: Dogs/Details/5
